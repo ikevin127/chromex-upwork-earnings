@@ -12,7 +12,7 @@ This chrome extension will enable display of the full Total earnings amount, reg
 2. To see the Total earnings amount, viewed profiles must have the Total earnings displayed on their profiles.
 3. To see somebody else's Total earnings you have to be logged in on Upwork, otherwise the Total earnings section will be hidden by Upwork.
 
-## Compiling the extension
+## Compiling
 
 In the project directory, you can run:
 
@@ -26,9 +26,9 @@ After installing the libraries, you can run:
 `npx webpack --config webpack.config.js`
 
 > [!IMPORTANT]
-> Compiles the source code which will output the `content.js` file which is used to run the extension (see `manifest.json`).
+> Compiles the source code which will output the `content.js` file that is used by Chrome (see `manifest.json`).
 
-## Testing the extension
+## Testing
 
 Go to Chrome > Manage Extensions and:
 1. Toggle `Developer mode` ON.
