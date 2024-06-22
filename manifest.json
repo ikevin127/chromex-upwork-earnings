@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Upwork Total Earnings",
     "description": "Display Total earnings on Upwork profile page regardless of increment step.",
-    "version": "1.5",
+    "version": "2.0",
     "icons": {
         "16": "assets/icons/icon128.png",
         "48": "assets/icons/icon128.png",
