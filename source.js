@@ -1,32 +1,5 @@
-const CONST = {
-    ELEMENT: {
-        SPAN: 'span'
-    },
-    CLASS: {
-        STAT_AMOUNT: '.stat-amount.h5'
-    },
-    TYPE: {
-        NUMBER: 'number',
-        STRING: 'string'
-    },
-    REGEX: {
-        FORMAT_AMOUNT: /\B(?=(\d{3})+(?!\d))/g
-    },
-    STRING: {
-        NA: 'N/A',
-        FREELANCERS: 'freelancers'
-    },
-    VALUE: {
-        MAX_ATTEMPTS: 10,
-        POLL_INTERVAL: 1000
-    },
-    SYMBOL: {
-        DOT: '.',
-        SLASH: '/',
-        TILDE: '~',
-        DOLLAR: '$'
-    }
-};
+import CONST from './CONST.js';
+let CACHED_EARNINGS;
 
 /**
  * Utility function to format the earnings value.
@@ -42,27 +15,58 @@ function formatEarningsAmount(value) {
     return formatEarnings;
 }
 
+function updateElements(elements, value, from = '') {
+    if (!elements || elements.length === 0) {
+        setTimeout(() => {
+            document.querySelectorAll(CONST.CLASS.STAT_AMOUNT).forEach((element, index) => {
+                // Update Total earnings text
+                if (index === 0) {
+                    const earningsSpan = element.querySelector(CONST.ELEMENT.SPAN);
+                    if (!earningsSpan) {
+                        console.info(`[${from} -> updateElements] -> early: Undefined earningsSpan: `, earningsSpan);
+                        return;
+                    }
+                    console.info(`[${from} -> updateElements]: Elements updated successfully.`);
+                    earningsSpan.textContent = `${CONST.SYMBOL.DOLLAR}${value}`;
+                }
+            });
+        }, CONST.VALUE.POLL_INTERVAL);
+        return;
+    }
+
+    elements.forEach((element, index) => {
+        // Update Total earnings text
+        if (index === 0) {
+            const earningsSpan = element.querySelector(CONST.ELEMENT.SPAN);
+            if (!earningsSpan) {
+                console.info('[updateElements] -> early: Undefined earningsSpan: ', earningsSpan);
+                return;
+            }
+            console.info('[updateElements]: Elements updated successfully.');
+            earningsSpan.textContent = `${CONST.SYMBOL.DOLLAR}${value}`;
+        }
+    });
+}
+
 /**
  * Function to replace the earnings figure on the page
  * @returns {boolean} Returns boolean indicating if the earnings were updated successfully.
  */
-function styleAndUpdateEarnings(earnings) {
+function styleAndUpdateEarnings(earnings, resizeUpdate = false) {
+    const formattedEarnings = formatEarningsAmount(earnings);
     const statAmountH5Elements = document.querySelectorAll(CONST.CLASS.STAT_AMOUNT);
+
+    if (resizeUpdate && statAmountH5Elements && statAmountH5Elements.length > 0) {
+        updateElements(undefined, formattedEarnings, CONST.STRING.RESIZE);
+        return true;
+    }
+
     if (!statAmountH5Elements || statAmountH5Elements.length === 0) {
         console.info('[styleAndUpdateEarnings] -> false: Invalid elements: ', statAmountH5Elements);
         return false;
     }
-    statAmountH5Elements.forEach((element, index) => {
-        // Update Total earnings text
-        if (index === 0) {
-            const earningsSpan = element.querySelector(CONST.ELEMENT.SPAN);
-            if (earningsSpan) {
-                const formattedEarnings = formatEarningsAmount(earnings);
-                earningsSpan.textContent = `${CONST.SYMBOL.DOLLAR}${formattedEarnings}`;
-            }
-        }
-    });
-    console.info('[styleAndUpdateEarnings] -> true: Elements updated successfully.');
+
+    updateElements(statAmountH5Elements, formattedEarnings);
     return true;
 }
 
@@ -116,25 +120,38 @@ function fetchAndDisplayEarnings() {
             return response.json();
         })
         .then(data => {
+            CACHED_EARNINGS = data?.profile?.stats?.totalEarningsNumValue;
             console.info('[fetchAndDisplayEarnings] -> Response OK: ', data);
-            const totalEarningsNumValue = data?.profile?.stats?.totalEarningsNumValue;
-            if (totalEarningsNumValue === undefined || typeof totalEarningsNumValue !== CONST.TYPE.NUMBER) {
-                console.info('[fetchAndDisplayEarnings] -> Invalid totalEarningsNumValue: ', totalEarningsNumValue);
+            if (!CACHED_EARNINGS || typeof CACHED_EARNINGS !== CONST.TYPE.NUMBER) {
+                console.info('[fetchAndDisplayEarnings] -> Invalid CACHED_EARNINGS: ', CACHED_EARNINGS);
                 return;
             }
 
             let attempts = 0;
-            const intervalId = setInterval(() => {
+            const intervalID = setInterval(() => {
                 attempts++;
                 console.info('[fetchAndDisplayEarnings] -> Polling count: ', attempts);
-                const isUpdated = styleAndUpdateEarnings(totalEarningsNumValue);
+                const isUpdated = styleAndUpdateEarnings(CACHED_EARNINGS);
                 if (isUpdated || attempts >= CONST.VALUE.MAX_ATTEMPTS) {
                     console.info('[fetchAndDisplayEarnings] -> Polling complete.');
-                    clearInterval(intervalId);
+                    clearInterval(intervalID);
                 }
             }, CONST.VALUE.POLL_INTERVAL);
         })
         .catch(error => console.warn('Error fetching and displaying earnings:', error));
 }
+
+// Event listener to handle window resize
+window.addEventListener('resize', resizeEvent => {
+    console.info('[WINDOW-RESIZE] -> resizeEvent: ', resizeEvent);
+    // check if CACHED_EARNINGS 
+    if (!CACHED_EARNINGS) {
+        console.info('[WINDOW-RESIZE] -> early: No cached earnings.');
+        return;
+    }
+    console.info('[WINDOW-RESIZE -> styleAndUpdateEarnings]: ', CACHED_EARNINGS);
+    styleAndUpdateEarnings(CACHED_EARNINGS, CONST.VALUE.SHOULD_UPDATE_EARNINGS);
+});
+
 // Call the function to fetch and display earnings
 fetchAndDisplayEarnings();
