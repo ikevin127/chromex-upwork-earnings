@@ -16,14 +16,14 @@ This chrome extension will enable display of the full Total earnings amount, reg
 
 In the project directory, you can run:
 
-`npm install`
+`npm install` or `yarn install`
 
 > [!IMPORTANT]
 > Installs webpack and libraries necessary for compiling the extension.
 
 After installing the libraries, you can run:
 
-`npx webpack --config webpack.config.js`
+`npm run build` or `yarn build`
 
 > [!IMPORTANT]
 > Compiles the source code which will output the `content.js` file that is used by Chrome (see `manifest.json`).
