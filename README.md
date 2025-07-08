@@ -1,4 +1,10 @@
-## Upwork Total Earnings
+## Upwork Total Earnings - Chrome Extension
+
+<img width="350" src="https://github.com/user-attachments/assets/7aff7cc2-a7ab-4184-a945-6e907e00e5b0">
+
+### Live on Chrome Web Store @ [Upwork Total Earnings](https://chromewebstore.google.com/detail/upwork-total-earnings/emajebmlmoabmhjgghkkiadlncpnbgle) (over 200 active users).
+
+##
 
 This chrome extension will enable display of the full Total earnings amount, regardless of the increment step.
 
