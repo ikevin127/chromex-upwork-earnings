@@ -8,6 +8,11 @@
         "48": "assets/icons/icon128.png",
         "128": "assets/icons/icon128.png"
     },
+    "permissions": ["cookies"],
+    "host_permissions": ["https://*.upwork.com/*"],
+    "background": {
+        "service_worker": "background.js"
+    },
     "content_scripts": [
         {
             "matches": ["https://www.upwork.com/freelancers/*"],
